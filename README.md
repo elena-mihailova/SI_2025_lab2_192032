@@ -122,4 +122,50 @@ V(G) = 8 + 1 = 9
 
 ### Објаснување
 Секој тест случај ги проверува сите можни комбинации на условите во изразот `if (item.getPrice() > 300 || item.getDiscount() > 0 || item.getQuantity() > 10)`.  
-- **Multiple Condition Coverage** бара секој услов да се тестира во секоја можна комбинација со другите услови.  
+- **Multiple Condition Coverage** бара секој услов да се тестира во секоја можна комбинација со другите услови.
+
+# Објаснување на напишаните unit tests
+### `everyStatementTest()`
+
+**Цел:** Да осигураме дека сите искази во кодот се извршени барем еднаш.
+
+#### 1. Тест случај: `allItems = null`
+`assertThrows(RuntimeException.class, () -> SILab2.checkCart(null, "1234567890123456"));`
+- **Влез:** `allItems = null`, `cardNumber = "1234567890123456"`
+- **Очекуван резултат:** `RuntimeException` со порака `"allItems list can't be null!"`
+
+#### 2. Тест случај: Невалиден број на картичка
+- `List<Item> items = List.of(new Item("Item1", 5, 200, 0));`
+- `assertThrows(RuntimeException.class, () -> SILab2.checkCart(items, null));`
+- `assertThrows(RuntimeException.class, () -> SILab2.checkCart(items, "123456"));`
+- **Влез:** 
+  - `allItems` содржи еден валиден предмет
+  - `cardNumber = null` или `"123456"`
+- **Очекуван резултат:** `RuntimeException` со порака `"Invalid card number!"`
+
+#### 3. Тест случај: Валидни податоци
+- **Влез:** 
+  - `allItems` содржи два предмети:
+    - Предмет 1: `price=350`, `discount=0.1`, `quantity=15`
+    - Предмет 2: `price=200`, `discount=0.2`, `quantity=5`
+  - `cardNumber = "1234567890123456"`
+- **Очекуван резултат:** Точно пресметана сума (`4205.0`).
+
+## Тестови за Multiple Condition критериумот
+### `multipleConditionTest()`
+
+**Цел:** Да се тестираат сите можни комбинации на условите во изразот:  
+`if (item.getPrice() > 300 || item.getDiscount() > 0 || item.getQuantity() > 10)`
+
+| Услови                      | Примерни вредности          | Очекуван резултат       |
+|-----------------------------|-----------------------------|-------------------------|
+| `price ≤ 300`, `discount ≤ 0`, `quantity ≤ 10` | `price=300`, `discount=0`, `quantity=10` | Сума без одземање на 30 |
+| `price > 300`               | `price=301`, `discount=0`, `quantity=10` | Сума - 30              |
+| `discount > 0`              | `price=300`, `discount=0.1`, `quantity=10` | Сума - 30              |
+| `quantity > 10`             | `price=300`, `discount=0`, `quantity=11` | Сума - 30              |
+| `price > 300` и `discount > 0` | `price=301`, `discount=0.1`, `quantity=10` | Сума - 30              |
+| `price > 300` и `quantity > 10` | `price=301`, `discount=0`, `quantity=11` | Сума - 30              |
+| `discount > 0` и `quantity > 10` | `price=300`, `discount=0.1`, `quantity=11` | Сума - 30              |
+| Сите услови `true`          | `price=301`, `discount=0.1`, `quantity=11` | Сума - 30              |
+
+---
